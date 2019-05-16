@@ -4,4 +4,6 @@ package embox.cmd
 @Cmd(name = "comparison", help = "Embox comparison test")
 module comparison {
 	source "comparison.c", "environment.c"
+
+	depends embox.kernel.task.syslib.waitpid
 }
