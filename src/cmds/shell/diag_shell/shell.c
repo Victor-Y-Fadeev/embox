@@ -121,7 +121,7 @@ static int diag_shell_exec(const char *cmdline) {
 static void diag_shell_run(void) {
 	static const char* prompt = OPTION_STRING_GET(prompt);
 
-	printf("\n%s", OPTION_STRING_GET(welcome_msg));
+	printf("\n%s\n", OPTION_STRING_GET(welcome_msg));
 	console_start(console, prompt);
 }
 
