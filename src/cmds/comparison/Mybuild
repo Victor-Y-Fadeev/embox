@@ -1,0 +1,7 @@
+package embox.cmd
+
+@AutoCmd
+@Cmd(name = "comparison", help = "Embox comparison test")
+module comparison {
+	source "comparison.c", "environment.c"
+}
