@@ -1,18 +1,9 @@
-/*
- * Copyright (c) 2019 OS Research Group
- * All rights reserved
+/**
+ * @file
+ * @brief
  *
- * Licensed under the Apache License, Version 2.0 (the ""License"");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an ""AS IS"" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @date 16.05.19
+ * @author Victor Y. Fadeev
  */
 
 #include "environment.h"
@@ -29,22 +20,32 @@ void two_points(const double value) {
 	printf("%d", (int) (value * 100) % 100);
 }
 
-void output(const char *str, const int *var, const int log) {
+void output(const char *str, int *var, int iter) {
+	var = &var[1];
+	iter--;
+
 	printf("\r\n---%s---\r\n", str);
-	printf("Iterations: %d\r\n", ITER);
+	printf("Iterations: %d\r\n", iter);
 
 	int average = 0;
-	for (int i = 1; i < ITER; i++) {
+	for (int i = 0; i < iter; i++) {
 		average += var[i];
 	}
 	printf("Average: ");
-	two_points(((double) average) / (ITER - 1));
+	two_points(((double) average) / iter);
+	printf(" us\r\n");
+
+	double variance = 0;
+	for (int i = 0; i < iter; i++) {
+		double temp = var[i] - ((double) average) / iter;
+		variance += temp * temp;
+	}
+	printf("Variance: ");
+	two_points(variance / iter);
 	printf(" us\r\n\r\n");
 
-	if (log) {
-		for (int i = 0; i < ITER; i++) {
-			printf("#%d switch - %d microsecond\r\n", i, var[i]);
-		}
+	for (int i = 0; i < iter; i++) {
+		printf("#%d switch - %d microsecond\r\n", i, var[i]);
 	}
 }
 
