@@ -42,7 +42,7 @@ void output(const char *str, int *var, int iter) {
 	}
 	printf("Variance: ");
 	two_points(variance / iter);
-	printf(" us\r\n\r\n");
+	printf("\r\n\r\n");
 
 	for (int i = 0; i < iter; i++) {
 		printf("#%d switch - %d microsecond\r\n", i, var[i]);
