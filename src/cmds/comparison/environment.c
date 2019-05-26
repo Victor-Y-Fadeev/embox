@@ -52,8 +52,8 @@ void output(const char *str, int *var, int iter) {
 void single(const char *str, const double average) {
 	printf("\r\n---%s---\r\n", str);
 	printf("Average: ");
-	two_points(average);
-	printf(" us\r\n\r\n");
+	two_points(average * 1000);
+	printf(" ns\r\n\r\n");
 }
 
 void error(const char *str) {

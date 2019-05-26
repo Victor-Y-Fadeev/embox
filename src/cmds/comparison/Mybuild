@@ -6,6 +6,8 @@ module comparison {
 	source "comparison.c", "environment.c"
 
 	depends embox.kernel.task.syslib.waitpid
+	depends embox.kernel.irq
+
 	depends embox.compat.posix.pthreads
 	depends embox.compat.posix.net.socket
 }
