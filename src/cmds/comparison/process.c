@@ -60,6 +60,5 @@ int main(int argc, char **argv) {
 	}
 
 	output("Process", var_full, ITER * 3);
-
 	return 0;
 }

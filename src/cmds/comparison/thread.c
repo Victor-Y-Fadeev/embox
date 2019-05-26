@@ -17,7 +17,7 @@ int period[3]= { 0, 0, 0 };
 int current[3] = { 0, 0, 0 };
 int var[ITER][3];
 
-pthread_t th, th2, th3;
+pthread_t th1, th2, th3;
 
 
 static void *task(void *arg) {
@@ -49,11 +49,11 @@ int main(int argc, char **argv) {
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 
-	pthread_create(&th, &attr, task, (void *) 0);
+	pthread_create(&th1, &attr, task, (void *) 0);
 	pthread_create(&th2, &attr, task, (void *) 1);
 	pthread_create(&th3, &attr, task, (void *) 2);
 
-	pthread_join(th, NULL);
+	pthread_join(th1, NULL);
 	pthread_join(th2, NULL);
 	pthread_join(th3, NULL);
 
@@ -64,6 +64,5 @@ int main(int argc, char **argv) {
 	}
 
 	output("Thread", var_full, ITER * 3);
-
 	return 0;
 }
