@@ -7,23 +7,18 @@
  */
 
 #include <stdio.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <net/inetdevice.h>
 #include <net/l3/route.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <util/err.h>
-#include <kernel/task.h>
 #include "environment.h"
 
 #define PORT 1
-#define ITER 500
+#define ITER 100
 
 static int var[ITER];
 static int current = 0;
-
-static int curTime = 0;
 
 static int sock_recv, sock_send;
 pthread_t th1, th2;
@@ -56,50 +51,50 @@ static void setup(void) {
 	connect(sock_send, (struct sockaddr *) &addr, sizeof(addr));
 }
 
-static inline void *Task1(void *arg) {
-    int message = 0;
+static void *task1(void *arg) {
+	int time;
   
-    while (current < ITER) 
-    {
-        message = clock();
-        send(sock_send, &message, sizeof(message), 0);
-    }
+	while (current < ITER) {
+		time = clock();
+		send(sock_send, &time, sizeof(time), 0);
+	}
 
-    thread_exit(NULL); //vTaskDelete(NULL);
+	return NULL;
 }
 
-static inline void *Task2(void *arg) {
-    int message = 0;
-    int ret = 0;
+static void *task2(void *arg) {
+	int time, cur_time;
+	int ret;
 
-    while (current <= ITER) 
-    {
-        ret = recv(sock_recv, &message, sizeof(message), 0);
-        curTime = clock();
+	while (current < ITER) {
+		ret = recv(sock_recv, &time, sizeof(time), 0);
+		cur_time = clock();
 
-        if (ret > 0 )
-        {
-			printf(" message = %d\n", message);
-            var[current] = curTime - message;
-            current++;
+		if (ret <= 0) {
+			error("Message fail");
+		}
 
-            if (current == ITER)
-            {
-                output("Full message test", var, ITER);
-                thread_exit(NULL);
-            }
-		
-            
-        }
-    }
-    thread_exit(NULL);
+		var[current] = cur_time - time;
+		current++;
+
+		if (current == ITER) {
+			output("Full message test", var, ITER);
+		}
+	}
+
+	return NULL;
 }
 
 int main(int argc, char **argv) {
 	setup();
-	
-	pthread_create(&th1, NULL, Task1, NULL);
-    pthread_create(&th2, NULL, Task2, NULL);
 
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	
+	pthread_create(&th1, &attr, task1, NULL);
+	pthread_create(&th2, &attr, task2, NULL);
+
+	pthread_join(th1, NULL);
+	pthread_join(th2, NULL);
 	return 0;
 }
