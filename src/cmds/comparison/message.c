@@ -3,7 +3,7 @@
  * @brief
  *
  * @date 26.05.19
- * @author Victor Y. Fadeev
+ * @author Egor Anikin
  */
 
 #include <stdio.h>
@@ -11,11 +11,22 @@
 #include <fcntl.h>
 #include <net/inetdevice.h>
 #include <net/l3/route.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <util/err.h>
+#include <kernel/task.h>
 #include "environment.h"
 
 #define PORT 1
+#define ITER 500
+
+static int var[ITER];
+static int current = 0;
+
+static int curTime = 0;
 
 static int sock_recv, sock_send;
+pthread_t th1, th2;
 
 
 static void setup(void) {
@@ -45,14 +56,50 @@ static void setup(void) {
 	connect(sock_send, (struct sockaddr *) &addr, sizeof(addr));
 }
 
+static inline void *Task1(void *arg) {
+    int message = 0;
+  
+    while (current < ITER) 
+    {
+        message = clock();
+        send(sock_send, &message, sizeof(message), 0);
+    }
+
+    thread_exit(NULL); //vTaskDelete(NULL);
+}
+
+static inline void *Task2(void *arg) {
+    int message = 0;
+    int ret = 0;
+
+    while (current <= ITER) 
+    {
+        ret = recv(sock_recv, &message, sizeof(message), 0);
+        curTime = clock();
+
+        if (ret > 0 )
+        {
+			printf(" message = %d\n", message);
+            var[current] = curTime - message;
+            current++;
+
+            if (current == ITER)
+            {
+                output("Full message test", var, ITER);
+                thread_exit(NULL);
+            }
+		
+            
+        }
+    }
+    thread_exit(NULL);
+}
+
 int main(int argc, char **argv) {
 	setup();
 	
-	int buf[3];
-	send(sock_send, "a", 1, 0);
-	recv(sock_recv, buf, 2, 0);
-
-	printf("buf[0] = %c\n", buf[0]);
+	pthread_create(&th1, NULL, Task1, NULL);
+    pthread_create(&th2, NULL, Task2, NULL);
 
 	return 0;
 }
