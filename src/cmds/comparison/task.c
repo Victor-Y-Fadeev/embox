@@ -11,7 +11,6 @@
 #include "environment.h"
 
 pthread_t th;
-pthread_attr_t attr;
 
 
 static void *task(void *arg) {
@@ -19,6 +18,8 @@ static void *task(void *arg) {
 }
 
 int main(int argc, char **argv) {
+	pthread_attr_t attr;
+
 	pthread_attr_init(&attr);
 	pthread_create(&th, &attr, task, NULL);
 

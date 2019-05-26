@@ -7,4 +7,5 @@ module comparison {
 
 	depends embox.kernel.task.syslib.waitpid
 	depends embox.compat.posix.pthreads
+	depends embox.compat.posix.net.socket
 }
