@@ -8,63 +8,58 @@
 
 #include <stdio.h>
 #include <kernel/task.h>
-#include <time.h>
 #include "environment.h"
 
 #define ITER 100
 
-int t[3]= {0,0,0};
+int period[3]= { 0, 0, 0 };
 
-int curent[3] = {0,0,0};
+int current[3] = { 0, 0, 0 };
 int var[ITER][3];
 
 
-static void * Task(void *nuber){
-    int n = (int)nuber;
-    int t1, t2, cur_time;
+static void *task(void *arg) {
+	int n = (int) arg;
+	int first, second, cur_time;
 
-    while(curent[n] < ITER) {
-        t1 = t[(n + 1) % 3];
-        t2 = t[(n + 2) % 3];
-        cur_time = clock();
+	while (current[n] < ITER) {
+		first = period[(n + 1) % 3];
+		second = period[(n + 2) % 3];
+		cur_time = clock();
 
-        if ((t1 != 0) && (t2 != 0))
-        {
-            if (t1 > t2)
-            {
-                var[curent[n]][n] = cur_time - t2;
-            }
-            else
-            {
-                var[curent[n]][n] = cur_time - t1;
-            }
-            curent[n]++;
-        }
-        t[n] = clock();
-    }
-   
-   return NULL; 
+		if (first != 0 && second != 0) {
+			if (first < second) {
+				var[current[n]][n] = cur_time - first;
+			} else {
+				var[current[n]][n] = cur_time - second;
+			}
+			current[n]++;
+		}
+		period[n] = clock();
+	}
+
+ 	return NULL; 
 }
 
 int main(int argc, char **argv) { 
-    int tid1, tid2, tid3;
-    int varFull[ITER * 3];
+	int tid1, tid2, tid3;
+	int var_full[ITER * 3];
 
-    tid1 = new_task("Task 1", Task, (void *) 0);
-    tid2 = new_task("Task 2", Task, (void *) 1);
-    tid3 = new_task("Task 3", Task, (void *) 2);
+	tid1 = new_task("Task 1", task, (void *) 0);
+	tid2 = new_task("Task 2", task, (void *) 1);
+	tid3 = new_task("Task 3", task, (void *) 2);
 
-    task_waitpid(tid1);
-    task_waitpid(tid2);
-    task_waitpid(tid3);
+	task_waitpid(tid1);
+	task_waitpid(tid2);
+	task_waitpid(tid3);
 
-    for (int i = 0; i < ITER; i++) {
-        for (int j = 0; j < 3; j++) {
-            varFull[i * 3 + j] = var[i][j];
-        }
+	for (int i = 0; i < ITER; i++) {
+		for (int j = 0; j < 3; j++) {
+			var_full[i * 3 + j] = var[i][j];
+		}
 	}
 
-    output("Process", varFull, ITER * 3);
+	output("Process", var_full, ITER * 3);
 
-    return 0;
+	return 0;
 }
