@@ -9,6 +9,8 @@
 #ifndef ENVIRONMENT_H_
 #define ENVIRONMENT_H_
 
+#define PRECISION 2
+
 
 void output(const char *str, int *var, int iter);
 void single(const char *str, const double average);
