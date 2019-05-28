@@ -10,14 +10,33 @@
 #include <stdio.h>
 
 
-void two_points(const double value) {
-	printf("%d.", (int) value);
-
-	if ((int) (value * 100) % 100 < 10) {
-		printf("0");
+void recursive_printf(double value, int precision) {
+	if (precision == 0) {
+		return;
 	}
 
-	printf("%d", (int) (value * 100) % 100);
+	value *= 10;
+	printf("%d", (int) value);
+	recursive_printf(value - (int) value, precision - 1);
+}
+
+void double_printf(double value) {
+	if (value < 0) {
+		value *= -1;
+	}
+
+	printf("%d.", (int) value);
+
+	double fractional = value;
+	for (int i = 0; i < PRECISION; i++) {
+		fractional *= 10;
+	}
+
+	if ((int) fractional == 0) {
+		recursive_printf(value - (int) value, PRECISION * 2);
+	} else {
+		recursive_printf(value - (int) value, PRECISION);
+	}
 }
 
 void output(const char *str, int *var, int iter) {
@@ -32,7 +51,7 @@ void output(const char *str, int *var, int iter) {
 		average += var[i];
 	}
 	printf("Average: ");
-	two_points(((double) average) / iter);
+	double_printf(((double) average) / iter);
 	printf(" us\r\n");
 
 	double variance = 0;
@@ -41,7 +60,7 @@ void output(const char *str, int *var, int iter) {
 		variance += temp * temp;
 	}
 	printf("Variance: ");
-	two_points(variance / iter);
+	double_printf(variance / iter);
 	printf("\r\n\r\n");
 
 	for (int i = 0; i < iter; i++) {
@@ -52,7 +71,7 @@ void output(const char *str, int *var, int iter) {
 void single(const char *str, const double average) {
 	printf("\r\n---%s---\r\n", str);
 	printf("Average: ");
-	two_points(average * 1000);
+	double_printf(average * 1000);
 	printf(" ns\r\n\r\n");
 }
 
